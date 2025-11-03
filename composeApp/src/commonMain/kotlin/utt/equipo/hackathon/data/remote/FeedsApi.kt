@@ -19,7 +19,15 @@ class FeedsApi(private val client: HttpClient) {
      */
     suspend fun getDashboard(): Result<DashboardData> {
         return try {
-            val response = client.get(Constants.Api.DASHBOARD)
+            val token = utt.equipo.hackathon.data.local.TokenManager.getToken()
+            println("🔐 FeedsApi.getDashboard - Token disponible: ${token?.take(20)}...")
+            
+            val response = client.get(Constants.Api.DASHBOARD) {
+                if (token != null) {
+                    header("Authorization", "Bearer $token")
+                    println("✅ Header Authorization agregado manualmente")
+                }
+            }
             
             when (response.status) {
                 HttpStatusCode.OK -> {
@@ -50,7 +58,13 @@ class FeedsApi(private val client: HttpClient) {
      */
     suspend fun getLeakStatus(): Result<LeakDetector> {
         return try {
-            val response = client.get(Constants.Api.LEAK_STATUS)
+            val token = utt.equipo.hackathon.data.local.TokenManager.getToken()
+            
+            val response = client.get(Constants.Api.LEAK_STATUS) {
+                if (token != null) {
+                    header("Authorization", "Bearer $token")
+                }
+            }
             
             when (response.status) {
                 HttpStatusCode.OK -> {
@@ -81,7 +95,13 @@ class FeedsApi(private val client: HttpClient) {
      */
     suspend fun getWaterFlow(): Result<WaterFlow> {
         return try {
-            val response = client.get(Constants.Api.WATER_FLOW)
+            val token = utt.equipo.hackathon.data.local.TokenManager.getToken()
+            
+            val response = client.get(Constants.Api.WATER_FLOW) {
+                if (token != null) {
+                    header("Authorization", "Bearer $token")
+                }
+            }
             
             when (response.status) {
                 HttpStatusCode.OK -> {
@@ -112,8 +132,13 @@ class FeedsApi(private val client: HttpClient) {
      */
     suspend fun getChartData(hours: Int = 24): Result<List<ChartDataPoint>> {
         return try {
+            val token = utt.equipo.hackathon.data.local.TokenManager.getToken()
+            
             val response = client.get(Constants.Api.WATER_FLOW_CHART) {
                 parameter("hours", hours)
+                if (token != null) {
+                    header("Authorization", "Bearer $token")
+                }
             }
             
             when (response.status) {

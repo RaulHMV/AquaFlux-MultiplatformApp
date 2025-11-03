@@ -22,8 +22,11 @@ class AuthRepository(
     suspend fun login(username: String, password: String): Result<LoginResponse> {
         return when (val result = authApi.login(username, password)) {
             is Result.Success -> {
+                println("💾 Guardando token en DataStore...")
+                
                 // Guardar token
                 TokenManager.saveToken(result.data.token)
+                println("✅ Token guardado: ${result.data.token.take(20)}...")
                 
                 // Guardar datos del usuario
                 localStorage.saveUserData(
@@ -31,9 +34,15 @@ class AuthRepository(
                     username = result.data.user.username,
                     firstName = result.data.user.first_name
                 )
+                println("✅ Datos de usuario guardados")
                 
                 // Marcar como logueado
                 localStorage.setLoggedIn(true)
+                println("✅ Usuario marcado como logueado")
+                
+                // Verificar que el token se guardó correctamente
+                val savedToken = TokenManager.getToken()
+                println("🔍 Token recuperado después de guardar: ${savedToken?.take(20)}...")
                 
                 Result.Success(result.data)
             }

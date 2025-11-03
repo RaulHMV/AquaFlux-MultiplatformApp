@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import utt.equipo.hackathon.presentation.ui.theme.AquaFluxColors
 import utt.equipo.hackathon.presentation.viewmodel.LoginState
 @FlowPreview
@@ -30,6 +31,8 @@ fun LoginScreen(
     
     LaunchedEffect(uiState) {
         if (uiState is LoginState.Success) {
+            // Delay para asegurar que DataStore termine de guardar el token
+            delay(500)
             onLoginSuccess()
         }
     }

@@ -31,6 +31,10 @@ fun DashboardScreen(
     val displayName = userFirstName?.trim().takeUnless { it.isNullOrEmpty() } ?: "Usuario"
 
     LaunchedEffect(Unit) {
+        // Cargar datos inmediatamente al entrar al dashboard
+        onRefresh()
+        
+        // Luego refrescar cada 30 segundos
         while (true) {
             delay(30000)
             onRefresh()

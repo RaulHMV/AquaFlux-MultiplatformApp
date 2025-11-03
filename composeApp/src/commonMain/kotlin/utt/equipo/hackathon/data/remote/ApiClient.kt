@@ -3,14 +3,11 @@
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
-import io.ktor.client.plugins.auth.*
-import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import utt.equipo.hackathon.data.local.TokenManager
 import utt.equipo.hackathon.util.Constants
 
 /**
@@ -42,18 +39,6 @@ object ApiClient {
                     }
                 }
                 level = LogLevel.ALL
-            }
-            
-            // Configuración de autenticación Bearer
-            install(Auth) {
-                bearer {
-                    loadTokens {
-                        val token = TokenManager.getToken()
-                        token?.let {
-                            BearerTokens(accessToken = it, refreshToken = "")
-                        }
-                    }
-                }
             }
             
             // Configuración de timeouts

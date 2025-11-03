@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Modelo de usuario - ACTUALIZADO para nueva API
+ * Modelo de usuario
  */
 @Serializable
 data class User(
