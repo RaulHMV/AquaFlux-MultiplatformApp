@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import utt.equipo.hackathon.presentation.ui.components.LineChart
 import utt.equipo.hackathon.presentation.ui.theme.AquaFluxColors
+import utt.equipo.hackathon.presentation.ui.theme.MontserratFontFamily
 import utt.equipo.hackathon.presentation.viewmodel.ChartState
 import utt.equipo.hackathon.presentation.viewmodel.DashboardState
 
@@ -28,13 +29,10 @@ fun DashboardScreen(
     onMenuClick: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    val displayName = userFirstName?.trim().takeUnless { it.isNullOrEmpty() } ?: "Usuario"
-
+    val MontserratFamily = MontserratFontFamily()
+    
     LaunchedEffect(Unit) {
-        // Cargar datos inmediatamente al entrar al dashboard
         onRefresh()
-        
-        // Luego refrescar cada 30 segundos
         while (true) {
             delay(30000)
             onRefresh()
@@ -44,144 +42,174 @@ fun DashboardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AquaFluxColors.AzulMasClaro)
+            .background(AquaFluxColors.AzulMasClaro) // Fondo azul oscuro general
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Header
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = AquaFluxColors.AzulOscuro,
-                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = when (uiState) {
-                            is DashboardState.Success -> "Hola, ${uiState.data.user.first_name}"
-                            else -> "Hola, Usuario"
-                        },
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AquaFluxColors.AmarilloClaro
-                    )
-                    IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = AquaFluxColors.AmarilloClaro)
-                    }
+        when (uiState) {
+            is DashboardState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = AquaFluxColors.AmarilloClaro)
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            when (uiState) {
-                is DashboardState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = AquaFluxColors.AmarilloClaro)
-                    }
-                }
-                is DashboardState.Success -> {
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp)
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+            is DashboardState.Success -> {
+                // CAMBIO: Columna principal con scroll y padding para la "Safe Zone"
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        // Padding para la "Safe Zone" (arriba, abajo, y lados)
+                        .padding(horizontal = 24.dp, vertical = 24.dp), 
+                    // Espacio automático entre todos los elementos
+                    verticalArrangement = Arrangement.spacedBy(24.dp) 
+                ) {
+                    
+                    // 1. Header Card (Con todos los ajustes)
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(), // Ahora respeta el padding del padre
+                        color = AquaFluxColors.AzulOscuro,
+                        shape = RoundedCornerShape(20.dp)
                     ) {
-                        // Estado Card
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = AquaFluxColors.AzulOscuro,
-                            shape = RoundedCornerShape(20.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp, vertical = 24.dp), // Padding interno
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.padding(20.dp)) {
-                                Text("Estado", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AquaFluxColors.AmarilloOscuro)
-                                Spacer(modifier = Modifier.height(8.dp))
+                            // CAMBIO: Column para "Hola," y "Mandujano"
+                            Column {
                                 Text(
-                                    text = if (uiState.data.sensors.leakDetector.hasLeak) "Fuga detectada" else "Sin fugas",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (uiState.data.sensors.leakDetector.hasLeak) AquaFluxColors.Rojo else AquaFluxColors.Verde
+                                    text = "Hola,",
+                                    fontSize = 30.sp, // CAMBIO: Tamaño
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = MontserratFamily,
+                                    color = AquaFluxColors.AmarilloClaro,
+                                    letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                                )
+                                Text(
+                                    text = uiState.data.user.first_name,
+                                    fontSize = 30.sp, // CAMBIO: Tamaño
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = MontserratFamily,
+                                    color = AquaFluxColors.AmarilloClaro,
+                                    letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                                )
+                            }
+                            IconButton(onClick = onMenuClick) {
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = "Menu",
+                                    tint = AquaFluxColors.AmarilloClaro,
+                                    // CAMBIO: Icono más grande
+                                    modifier = Modifier.size(40.dp) 
                                 )
                             }
                         }
+                    }
 
-                        // Litros Card
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = AquaFluxColors.AzulOscuro,
-                            shape = RoundedCornerShape(20.dp)
+                    // 2. "Estado" Block
+                    Text(
+                        text = "Estado",
+                        fontSize = 30.sp, // CAMBIO: Tamaño
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = MontserratFamily,
+                        color = AquaFluxColors.AmarilloClaro,
+                        letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                    )
+                    Text(
+                        text = if (uiState.data.sensors.leakDetector.hasLeak) "Se detectaron fugas" else "No se detectaron fugas",
+                        fontSize = 20.sp, // CAMBIO: Tamaño
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = MontserratFamily,
+                        color = AquaFluxColors.AmarilloClaro,
+                        letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                    )
+
+                    // 3. "Litros" Card (CAMBIO: Título DENTRO de la card)
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = AquaFluxColors.AzulOscuro,
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalAlignment = Alignment.Start, // Título a la izquierda
+                            verticalArrangement = Arrangement.spacedBy(16.dp) // Espacio entre título y número
                         ) {
-                            Column(modifier = Modifier.padding(20.dp)) {
-                                Text("Litros detectados en fuga", fontSize = 16.sp, color = AquaFluxColors.Blanco)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "${uiState.data.sensors.waterFlow.liters} L",
-                                    fontSize = 48.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = AquaFluxColors.AmarilloClaro
-                                )
-                            }
+                            Text(
+                                text = "Litros detectados en fuga",
+                                fontSize = 20.sp, // CAMBIO: Tamaño
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = MontserratFamily,
+                                color = AquaFluxColors.AmarilloClaro,
+                                letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                            )
+                            Text(
+                                text = uiState.data.sensors.waterFlow.liters.toString(),
+                                fontSize = 52.sp, // CAMBIO: Tamaño mucho más grande
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = MontserratFamily,
+                                color = AquaFluxColors.AmarilloClaro,
+                                letterSpacing = 1.5.sp, // CAMBIO: Espaciado
+                                // Centra el número en la tarjeta
+                                modifier = Modifier.align(Alignment.CenterHorizontally) 
+                            )
                         }
+                    }
 
-                        // Chart Card
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = AquaFluxColors.AzulOscuro,
-                            shape = RoundedCornerShape(20.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(20.dp)) {
-                                Text(
-                                    "Historial de Fuga",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = AquaFluxColors.AmarilloOscuro
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                
-                                when (chartState) {
-                                    is ChartState.Loading -> {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth().height(200.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            CircularProgressIndicator(color = AquaFluxColors.AmarilloClaro)
-                                        }
+                    // 4. "Gráfica" Card (Sin cambios, se mantiene perfecta)
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = AquaFluxColors.AzulOscuro,
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            when (chartState) {
+                                is ChartState.Loading -> {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(color = AquaFluxColors.AmarilloClaro)
                                     }
-                                    is ChartState.Success -> {
-                                        LineChart(
-                                            data = chartState.data,
-                                            lineColor = AquaFluxColors.AmarilloClaro,
-                                            backgroundColor = AquaFluxColors.AzulOscuro
+                                }
+                                is ChartState.Success -> {
+                                    LineChart(
+                                        data = chartState.data,
+                                        lineColor = AquaFluxColors.AmarilloClaro,
+                                        backgroundColor = AquaFluxColors.AzulOscuro
+                                    )
+                                }
+                                is ChartState.Error -> {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            "Error al cargar gráfico",
+                                            color = AquaFluxColors.Rojo.copy(alpha = 0.7f),
+                                            fontSize = 16.sp, // CAMBIO: Tamaño
+                                            fontFamily = MontserratFamily,
+                                            letterSpacing = 1.5.sp // CAMBIO: Espaciado
                                         )
                                     }
-                                    is ChartState.Error -> {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth().height(200.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                "Error al cargar gráfico",
-                                                color = AquaFluxColors.Rojo.copy(alpha = 0.7f),
-                                                fontSize = 14.sp
-                                            )
-                                        }
-                                    }
-                                    else -> {}
                                 }
+                                else -> {}
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
-                is DashboardState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(uiState.message, color = AquaFluxColors.Rojo)
-                    }
-                }
-                else -> {}
             }
+            is DashboardState.Error -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        uiState.message,
+                        color = AquaFluxColors.Rojo,
+                        fontFamily = MontserratFamily,
+                        letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                    )
+                }
+            }
+            else -> {}
         }
     }
 }
