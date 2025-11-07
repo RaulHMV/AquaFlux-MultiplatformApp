@@ -83,7 +83,9 @@ class DashboardViewModel(
             
             when (val result = getChartDataUseCase()) {
                 is Result.Success -> {
-                    _chartState.value = ChartState.Success(result.data)
+                    // Invertir el orden: datos más antiguos a la izquierda, más nuevos a la derecha
+                    val reversedData = result.data.reversed()
+                    _chartState.value = ChartState.Success(reversedData)
                 }
                 is Result.Error -> {
                     _chartState.value = ChartState.Error(result.message)
