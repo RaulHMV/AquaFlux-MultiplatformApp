@@ -92,7 +92,7 @@ fun AquaFluxNavigation(
                     navController.navigate(Screen.Menu.route)
                 },
                 onRefresh = {
-                    dashboardViewModel.loadDashboard()
+                    dashboardViewModel.refresh()
                 }
             )
         }

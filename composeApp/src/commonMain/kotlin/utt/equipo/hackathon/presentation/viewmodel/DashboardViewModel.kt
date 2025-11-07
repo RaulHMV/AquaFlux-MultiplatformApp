@@ -51,6 +51,14 @@ class DashboardViewModel(
         loadChartData()
     }
     
+    /**
+     * Refrescar todos los datos del dashboard
+     */
+    fun refresh() {
+        loadDashboard()
+        loadChartData()
+    }
+    
     fun loadDashboard() {
         viewModelScope.launch {
             _uiState.value = DashboardState.Loading
