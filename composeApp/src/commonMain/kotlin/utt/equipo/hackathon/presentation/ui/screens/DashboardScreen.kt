@@ -29,7 +29,7 @@ fun DashboardScreen(
     onMenuClick: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    val MontserratFamily = MontserratFontFamily()
+    val montserratFamily = MontserratFontFamily()
     
     LaunchedEffect(Unit) {
         onRefresh()
@@ -42,7 +42,7 @@ fun DashboardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AquaFluxColors.AzulMasClaro) // Fondo azul oscuro general
+            .background(AquaFluxColors.AzulMasClaro)
     ) {
         when (uiState) {
             is DashboardState.Loading -> {
@@ -51,47 +51,42 @@ fun DashboardScreen(
                 }
             }
             is DashboardState.Success -> {
-                // CAMBIO: Columna principal con scroll y padding para la "Safe Zone"
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        // Padding para la "Safe Zone" (arriba, abajo, y lados)
                         .padding(horizontal = 24.dp, vertical = 24.dp), 
-                    // Espacio automático entre todos los elementos
                     verticalArrangement = Arrangement.spacedBy(24.dp) 
                 ) {
                     
-                    // 1. Header Card (Con todos los ajustes)
                     Surface(
-                        modifier = Modifier.fillMaxWidth(), // Ahora respeta el padding del padre
+                        modifier = Modifier.fillMaxWidth(),
                         color = AquaFluxColors.AzulOscuro,
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 24.dp, vertical = 24.dp), // Padding interno
+                                .padding(horizontal = 24.dp, vertical = 24.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // CAMBIO: Column para "Hola," y "Mandujano"
                             Column {
                                 Text(
                                     text = "Hola,",
-                                    fontSize = 30.sp, // CAMBIO: Tamaño
+                                    fontSize = 30.sp,
                                     fontWeight = FontWeight.Medium,
-                                    fontFamily = MontserratFamily,
+                                    fontFamily = montserratFamily,
                                     color = AquaFluxColors.AmarilloClaro,
-                                    letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                                    letterSpacing = 1.5.sp
                                 )
                                 Text(
                                     text = uiState.data.user.first_name,
-                                    fontSize = 30.sp, // CAMBIO: Tamaño
+                                    fontSize = 30.sp,
                                     fontWeight = FontWeight.Medium,
-                                    fontFamily = MontserratFamily,
+                                    fontFamily = montserratFamily,
                                     color = AquaFluxColors.AmarilloClaro,
-                                    letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                                    letterSpacing = 1.5.sp
                                 )
                             }
                             IconButton(onClick = onMenuClick) {
@@ -99,46 +94,39 @@ fun DashboardScreen(
                                     Icons.Default.Menu,
                                     contentDescription = "Menu",
                                     tint = AquaFluxColors.AmarilloClaro,
-                                    // CAMBIO: Icono más grande
                                     modifier = Modifier.size(40.dp) 
                                 )
                             }
                         }
                     }
 
-                    // 2. "Estado" Block
-                    // Lógica de detección de fugas:
-                    // - Presostato = 0, YSF = 0 o mayor → No se detectaron fugas
-                    // - Presostato = 1, YSF = 0 → No hay fuga
-                    // - Presostato = 1, YSF > 0 → Se detectaron fugas
                     val presostato = if (uiState.data.sensors.leakDetector.hasLeak) 1 else 0
                     val ysf = uiState.data.sensors.waterFlow.liters
                     
                     val hasFugaDetectada = when {
-                        presostato == 0 -> false // Presostato en 0 → No hay fuga
-                        presostato == 1 && ysf == 0.0 -> false // Presostato en 1 pero YSF en 0 → No hay fuga
-                        presostato == 1 && ysf > 0.0 -> true // Presostato en 1 y YSF > 0 → Sí hay fuga
+                        presostato == 0 -> false
+                        presostato == 1 && ysf == 0.0 -> false
+                        presostato == 1 && ysf > 0.0 -> true
                         else -> false
                     }
                     
                     Text(
                         text = "Estado",
-                        fontSize = 30.sp, // CAMBIO: Tamaño
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = MontserratFamily,
+                        fontFamily = montserratFamily,
                         color = AquaFluxColors.AmarilloClaro,
-                        letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                        letterSpacing = 1.5.sp
                     )
                     Text(
                         text = if (hasFugaDetectada) "Se detectaron fugas" else "No se detectaron fugas",
-                        fontSize = 20.sp, // CAMBIO: Tamaño
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Normal,
-                        fontFamily = MontserratFamily,
+                        fontFamily = montserratFamily,
                         color = AquaFluxColors.AmarilloClaro,
-                        letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                        letterSpacing = 1.5.sp
                     )
 
-                    // 3. "Litros" Card (CAMBIO: Título DENTRO de la card)
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
                         color = AquaFluxColors.AzulOscuro,
@@ -146,31 +134,28 @@ fun DashboardScreen(
                     ) {
                         Column(
                             modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.Start, // Título a la izquierda
-                            verticalArrangement = Arrangement.spacedBy(16.dp) // Espacio entre título y número
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Text(
-                                text = "Litros detectados en fuga",
-                                fontSize = 20.sp, // CAMBIO: Tamaño
+                                text = "Litros detectados",
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Medium,
-                                fontFamily = MontserratFamily,
+                                fontFamily = montserratFamily,
                                 color = AquaFluxColors.AmarilloClaro,
-                                letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                                letterSpacing = 1.5.sp
                             )
                             Text(
                                 text = uiState.data.sensors.waterFlow.liters.toString(),
-                                fontSize = 52.sp, // CAMBIO: Tamaño mucho más grande
+                                fontSize = 52.sp,
                                 fontWeight = FontWeight.Medium,
-                                fontFamily = MontserratFamily,
+                                fontFamily = montserratFamily,
                                 color = AquaFluxColors.AmarilloClaro,
-                                letterSpacing = 1.5.sp, // CAMBIO: Espaciado
-                                // Centra el número en la tarjeta
-                                modifier = Modifier.align(Alignment.CenterHorizontally) 
+                                letterSpacing = 1.5.sp
                             )
                         }
                     }
 
-                    // 4. "Gráfica" Card (Sin cambios, se mantiene perfecta)
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
                         color = AquaFluxColors.AzulOscuro,
@@ -201,9 +186,9 @@ fun DashboardScreen(
                                         Text(
                                             "Error al cargar gráfico",
                                             color = AquaFluxColors.Rojo.copy(alpha = 0.7f),
-                                            fontSize = 16.sp, // CAMBIO: Tamaño
-                                            fontFamily = MontserratFamily,
-                                            letterSpacing = 1.5.sp // CAMBIO: Espaciado
+                                            fontSize = 16.sp,
+                                            fontFamily = montserratFamily,
+                                            letterSpacing = 1.5.sp
                                         )
                                     }
                                 }
@@ -218,7 +203,7 @@ fun DashboardScreen(
                     Text(
                         uiState.message,
                         color = AquaFluxColors.Rojo,
-                        fontFamily = MontserratFamily,
+                        fontFamily = montserratFamily,
                         letterSpacing = 1.5.sp // CAMBIO: Espaciado
                     )
                 }
