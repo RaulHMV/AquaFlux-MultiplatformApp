@@ -107,6 +107,20 @@ fun DashboardScreen(
                     }
 
                     // 2. "Estado" Block
+                    // Lógica de detección de fugas:
+                    // - Presostato = 0, YSF = 0 o mayor → No se detectaron fugas
+                    // - Presostato = 1, YSF = 0 → No hay fuga
+                    // - Presostato = 1, YSF > 0 → Se detectaron fugas
+                    val presostato = if (uiState.data.sensors.leakDetector.hasLeak) 1 else 0
+                    val ysf = uiState.data.sensors.waterFlow.liters
+                    
+                    val hasFugaDetectada = when {
+                        presostato == 0 -> false // Presostato en 0 → No hay fuga
+                        presostato == 1 && ysf == 0.0 -> false // Presostato en 1 pero YSF en 0 → No hay fuga
+                        presostato == 1 && ysf > 0.0 -> true // Presostato en 1 y YSF > 0 → Sí hay fuga
+                        else -> false
+                    }
+                    
                     Text(
                         text = "Estado",
                         fontSize = 30.sp, // CAMBIO: Tamaño
@@ -116,7 +130,7 @@ fun DashboardScreen(
                         letterSpacing = 1.5.sp // CAMBIO: Espaciado
                     )
                     Text(
-                        text = if (uiState.data.sensors.leakDetector.hasLeak) "Se detectaron fugas" else "No se detectaron fugas",
+                        text = if (hasFugaDetectada) "Se detectaron fugas" else "No se detectaron fugas",
                         fontSize = 20.sp, // CAMBIO: Tamaño
                         fontWeight = FontWeight.Normal,
                         fontFamily = MontserratFamily,
