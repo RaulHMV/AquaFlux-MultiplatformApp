@@ -20,14 +20,17 @@ import utt.equipo.hackathon.presentation.ui.theme.AquaFluxColors
 import utt.equipo.hackathon.presentation.ui.theme.MontserratFontFamily
 import utt.equipo.hackathon.presentation.viewmodel.ChartState
 import utt.equipo.hackathon.presentation.viewmodel.DashboardState
+import utt.equipo.hackathon.presentation.viewmodel.TimeFilter
 
 @Composable
 fun DashboardScreen(
     uiState: DashboardState,
     chartState: ChartState,
+    selectedTimeFilter: TimeFilter,
     userFirstName: String? = null,
     onMenuClick: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onTimeFilterChange: (TimeFilter) -> Unit
 ) {
     val montserratFamily = MontserratFontFamily()
     
@@ -162,6 +165,45 @@ fun DashboardScreen(
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Column(modifier = Modifier.padding(20.dp)) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                TimeFilter.entries.forEach { filter ->
+                                    Button(
+                                        onClick = { onTimeFilterChange(filter) },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (selectedTimeFilter == filter) {
+                                                AquaFluxColors.AmarilloClaro
+                                            } else {
+                                                AquaFluxColors.AzulMasClaro
+                                            },
+                                            contentColor = if (selectedTimeFilter == filter) {
+                                                AquaFluxColors.AzulOscuro
+                                            } else {
+                                                AquaFluxColors.AmarilloClaro
+                                            }
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Text(
+                                            text = filter.label,
+                                            fontFamily = montserratFamily,
+                                            fontWeight = if (selectedTimeFilter == filter) {
+                                                FontWeight.Bold
+                                            } else {
+                                                FontWeight.Normal
+                                            },
+                                            fontSize = 14.sp,
+                                            letterSpacing = 1.sp
+                                        )
+                                    }
+                                }
+                            }
+                            
                             when (chartState) {
                                 is ChartState.Loading -> {
                                     Box(

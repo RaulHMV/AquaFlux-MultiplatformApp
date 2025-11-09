@@ -84,15 +84,20 @@ fun AquaFluxNavigation(
         composable(Screen.Dashboard.route) {
             val uiState by dashboardViewModel.uiState.collectAsState()
             val chartState by dashboardViewModel.chartState.collectAsState()
+            val selectedTimeFilter by dashboardViewModel.selectedTimeFilter.collectAsState()
             
             DashboardScreen(
                 uiState = uiState,
                 chartState = chartState,
+                selectedTimeFilter = selectedTimeFilter,
                 onMenuClick = {
                     navController.navigate(Screen.Menu.route)
                 },
                 onRefresh = {
                     dashboardViewModel.refresh()
+                },
+                onTimeFilterChange = { filter ->
+                    dashboardViewModel.setTimeFilter(filter)
                 }
             )
         }

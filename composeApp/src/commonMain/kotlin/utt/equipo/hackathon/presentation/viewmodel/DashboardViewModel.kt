@@ -33,6 +33,15 @@ sealed class ChartState {
 }
 
 /**
+ * Filtros de tiempo para la gráfica
+ */
+enum class TimeFilter(val hours: Int, val label: String) {
+    ONE_HOUR(1, "1h"),
+    ONE_DAY(24, "24h"),
+    ONE_WEEK(168, "7d")
+}
+
+/**
  * ViewModel para la pantalla de Dashboard
  */
 class DashboardViewModel(
@@ -46,6 +55,9 @@ class DashboardViewModel(
     private val _chartState = MutableStateFlow<ChartState>(ChartState.Idle)
     val chartState: StateFlow<ChartState> = _chartState.asStateFlow()
     
+    private val _selectedTimeFilter = MutableStateFlow(TimeFilter.ONE_DAY)
+    val selectedTimeFilter: StateFlow<TimeFilter> = _selectedTimeFilter.asStateFlow()
+    
     init {
         loadDashboard()
         loadChartData()
@@ -56,6 +68,14 @@ class DashboardViewModel(
      */
     fun refresh() {
         loadDashboard()
+        loadChartData()
+    }
+    
+    /**
+     * Cambiar el filtro de tiempo de la gráfica
+     */
+    fun setTimeFilter(filter: TimeFilter) {
+        _selectedTimeFilter.value = filter
         loadChartData()
     }
     
@@ -81,9 +101,8 @@ class DashboardViewModel(
         viewModelScope.launch {
             _chartState.value = ChartState.Loading
             
-            when (val result = getChartDataUseCase()) {
+            when (val result = getChartDataUseCase(_selectedTimeFilter.value.hours)) {
                 is Result.Success -> {
-                    // Invertir el orden: datos más antiguos a la izquierda, más nuevos a la derecha
                     val reversedData = result.data.reversed()
                     _chartState.value = ChartState.Success(reversedData)
                 }
