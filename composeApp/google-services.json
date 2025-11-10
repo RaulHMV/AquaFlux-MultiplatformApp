@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "572713685277",
+    "project_id": "aquaflux-ec94e",
+    "storage_bucket": "aquaflux-ec94e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572713685277:android:46e163718d88e49ba8d1f4",
+        "android_client_info": {
+          "package_name": "utt.equipo.hackathon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArAQRvWyJfu0GS5vMeE3X_Yh5Q_HN_rDQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

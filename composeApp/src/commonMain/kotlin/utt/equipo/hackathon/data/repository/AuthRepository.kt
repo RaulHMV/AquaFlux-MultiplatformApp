@@ -12,7 +12,8 @@ import utt.equipo.hackathon.util.Result
  */
 class AuthRepository(
     private val authApi: AuthApi,
-    private val localStorage: LocalStorage
+    private val localStorage: LocalStorage,
+    private val notificationApi: utt.equipo.hackathon.notifications.NotificationApiService? = null
 ) {
     
     /**
@@ -67,6 +68,16 @@ class AuthRepository(
      * Limpia todos los datos guardados
      */
     suspend fun logout() {
+        // Intentar eliminar FCM token del backend antes de limpiar
+        try {
+            val token = TokenManager.getToken()
+            if (!token.isNullOrBlank() && notificationApi != null) {
+                notificationApi.removeFCMToken(token)
+            }
+        } catch (_: Exception) {
+            // Ignorar errores al eliminar token FCM
+        }
+        
         TokenManager.clearToken()
         localStorage.clear()
     }

@@ -40,10 +40,15 @@ object DependencyContainer {
     private val feedsApi by lazy {
         FeedsApi(httpClient)
     }
+
+    // Notification API service
+    val notificationApiService by lazy {
+        utt.equipo.hackathon.notifications.NotificationApiService(httpClient)
+    }
     
     // Repositories
     val authRepository by lazy {
-        AuthRepository(authApi, _localStorage)
+        AuthRepository(authApi, _localStorage, notificationApiService)
     }
     
     val feedsRepository by lazy {

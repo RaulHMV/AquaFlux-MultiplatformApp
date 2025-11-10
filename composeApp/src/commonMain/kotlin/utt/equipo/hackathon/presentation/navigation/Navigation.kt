@@ -85,11 +85,13 @@ fun AquaFluxNavigation(
             val uiState by dashboardViewModel.uiState.collectAsState()
             val chartState by dashboardViewModel.chartState.collectAsState()
             val selectedTimeFilter by dashboardViewModel.selectedTimeFilter.collectAsState()
+            val showPermissionDialog by dashboardViewModel.showPermissionDialog.collectAsState()
             
             DashboardScreen(
                 uiState = uiState,
                 chartState = chartState,
                 selectedTimeFilter = selectedTimeFilter,
+                showPermissionDialog = showPermissionDialog,
                 onMenuClick = {
                     navController.navigate(Screen.Menu.route)
                 },
@@ -98,6 +100,12 @@ fun AquaFluxNavigation(
                 },
                 onTimeFilterChange = { filter ->
                     dashboardViewModel.setTimeFilter(filter)
+                },
+                onPermissionDialogConfirm = {
+                    dashboardViewModel.onPermissionDialogConfirm()
+                },
+                onPermissionDialogDismiss = {
+                    dashboardViewModel.onPermissionDialogDismiss()
                 }
             )
         }

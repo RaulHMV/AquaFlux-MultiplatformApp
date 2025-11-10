@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinx.serialization)
-    // alias(libs.plugins.google.services) // Commented out until google-services.json is added
+    alias(libs.plugins.google.services)
 }
 
 kotlin {
@@ -47,8 +47,9 @@ kotlin {
                 // Kotlinx Android
                 implementation(libs.kotlinx.coroutines.android)
 
-                // Firebase Messaging - Commented out until google-services.json is added
-                // implementation("com.google.firebase:firebase-messaging-ktx:24.1.2")
+                // Firebase (sin BoM en KMP, especificamos versiones directamente)
+                implementation(libs.firebase.analytics)
+                implementation(libs.firebase.messaging)
 
                 // WorkManager
                 implementation(libs.androidx.work.runtime)

@@ -12,7 +12,10 @@ import utt.equipo.hackathon.presentation.viewmodel.RegisterViewModel
  * Punto de entrada principal de la aplicación AquaFlux
  */
 @Composable
-fun App() {
+fun App(
+    notificationManager: utt.equipo.hackathon.notifications.NotificationManager? = null,
+    notificationApiService: utt.equipo.hackathon.notifications.NotificationApiService? = null
+) {
     // Inicializar ViewModels
     val loginViewModel = LoginViewModel(
         loginUseCase = DependencyContainer.loginUseCase
@@ -24,7 +27,9 @@ fun App() {
     
     val dashboardViewModel = DashboardViewModel(
         getDashboardUseCase = DependencyContainer.getDashboardUseCase,
-        getChartDataUseCase = DependencyContainer.getChartDataUseCase
+        getChartDataUseCase = DependencyContainer.getChartDataUseCase,
+        notificationManager = notificationManager,
+        notificationApi = notificationApiService ?: DependencyContainer.notificationApiService
     )
     
     // Aplicar tema y navegación

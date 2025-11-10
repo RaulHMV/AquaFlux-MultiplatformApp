@@ -11,6 +11,9 @@ import utt.equipo.hackathon.data.models.DashboardData
 import utt.equipo.hackathon.domain.usecases.GetChartDataUseCase
 import utt.equipo.hackathon.domain.usecases.GetDashboardUseCase
 import utt.equipo.hackathon.util.Result
+import utt.equipo.hackathon.notifications.NotificationManager
+import utt.equipo.hackathon.notifications.NotificationApiService
+import utt.equipo.hackathon.notifications.NotificationData
 
 /**
  * Estados del Dashboard
@@ -46,7 +49,9 @@ enum class TimeFilter(val hours: Int, val label: String) {
  */
 class DashboardViewModel(
     private val getDashboardUseCase: GetDashboardUseCase,
-    private val getChartDataUseCase: GetChartDataUseCase
+    private val getChartDataUseCase: GetChartDataUseCase,
+    private val notificationManager: NotificationManager? = null,
+    private val notificationApi: NotificationApiService? = null
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow<DashboardState>(DashboardState.Idle)
@@ -58,9 +63,13 @@ class DashboardViewModel(
     private val _selectedTimeFilter = MutableStateFlow(TimeFilter.ONE_DAY)
     val selectedTimeFilter: StateFlow<TimeFilter> = _selectedTimeFilter.asStateFlow()
     
+    private val _showPermissionDialog = MutableStateFlow(false)
+    val showPermissionDialog: StateFlow<Boolean> = _showPermissionDialog.asStateFlow()
+    
     init {
         loadDashboard()
         loadChartData()
+        setupNotifications()
     }
     
     /**
@@ -77,6 +86,54 @@ class DashboardViewModel(
     fun setTimeFilter(filter: TimeFilter) {
         _selectedTimeFilter.value = filter
         loadChartData()
+    }
+
+    private fun setupNotifications() {
+        if (notificationManager == null || notificationApi == null) return
+
+        viewModelScope.launch {
+            try {
+                notificationManager.initialize()
+                if (!notificationManager.hasNotificationPermission()) {
+                    _showPermissionDialog.value = true
+                } else {
+                    registerFCMToken()
+                }
+            } catch (_: Exception) {
+                // Ignore notification initialization errors
+            }
+        }
+    }
+
+    fun onPermissionDialogConfirm() {
+        _showPermissionDialog.value = false
+        if (notificationManager == null || notificationApi == null) return
+
+        viewModelScope.launch {
+            val granted = try {
+                notificationManager.requestNotificationPermission()
+            } catch (e: Exception) {
+                false
+            }
+            if (granted) registerFCMToken()
+        }
+    }
+
+    fun onPermissionDialogDismiss() {
+        _showPermissionDialog.value = false
+    }
+
+    private suspend fun registerFCMToken() {
+        if (notificationManager == null || notificationApi == null) return
+
+        val token = try { notificationManager.getFCMToken() } catch (_: Exception) { null }
+        if (token.isNullOrBlank()) return
+
+        // Try to get stored JWT token from TokenManager (local storage)
+        val jwt = try { utt.equipo.hackathon.data.local.TokenManager.getToken() } catch (_: Exception) { null }
+        if (jwt.isNullOrBlank()) return
+
+        notificationApi.registerFCMToken(jwt, token)
     }
     
     fun loadDashboard() {

@@ -27,12 +27,49 @@ fun DashboardScreen(
     uiState: DashboardState,
     chartState: ChartState,
     selectedTimeFilter: TimeFilter,
+    showPermissionDialog: Boolean,
     userFirstName: String? = null,
     onMenuClick: () -> Unit,
     onRefresh: () -> Unit,
-    onTimeFilterChange: (TimeFilter) -> Unit
+    onTimeFilterChange: (TimeFilter) -> Unit,
+    onPermissionDialogConfirm: () -> Unit,
+    onPermissionDialogDismiss: () -> Unit
 ) {
     val montserratFamily = MontserratFontFamily()
+    
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = onPermissionDialogDismiss,
+            title = {
+                Text(
+                    "Activar Notificaciones",
+                    fontFamily = montserratFamily,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    "AquaFlux necesita permisos de notificaciones para alertarte cuando se detecten fugas de agua.",
+                    fontFamily = montserratFamily
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = onPermissionDialogConfirm,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AquaFluxColors.AmarilloClaro
+                    )
+                ) {
+                    Text("Activar", fontFamily = montserratFamily, color = AquaFluxColors.AzulOscuro)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onPermissionDialogDismiss) {
+                    Text("Ahora no", fontFamily = montserratFamily, color = AquaFluxColors.AmarilloClaro)
+                }
+            }
+        )
+    }
     
     LaunchedEffect(Unit) {
         onRefresh()
