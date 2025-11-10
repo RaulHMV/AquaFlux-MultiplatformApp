@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "572713685277",
-    "project_id": "aquaflux-ec94e",
-    "storage_bucket": "aquaflux-ec94e.firebasestorage.app"
+    "project_number": "secret_number",
+    "project_id": "secret_id",
+    "storage_bucket": "secret_id.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:572713685277:android:46e163718d88e49ba8d1f4",
+        "mobilesdk_app_id": "secret_id"
         "android_client_info": {
-          "package_name": "utt.equipo.hackathon"
+          "package_name": "secret_name"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyArAQRvWyJfu0GS5vMeE3X_Yh5Q_HN_rDQ"
+          "current_key": "secret_key"
         }
       ],
       "services": {
